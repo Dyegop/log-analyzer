@@ -1,0 +1,48 @@
+# Keeps the build context small. Everything listed here would otherwise be
+# uploaded to the daemon on every build, land inside the image via `COPY .`,
+# and invalidate the layer cache whenever it changed.
+#
+# Patterns are matched against the whole path from the context root, and `*`
+# does not cross a `/`. Anything that can appear in a subdirectory therefore
+# needs a `**/` prefix to be excluded everywhere rather than only at the root.
+
+# Virtual environments. The image builds its own at /venv.
+**/.venv/
+**/venv/
+
+# Version control and CI metadata
+.git/
+.gitattributes
+.github/
+
+# Python bytecode and packaging artifacts
+**/__pycache__/
+**/*.py[codz]
+**/*$py.class
+**/*.so
+**/*.egg-info/
+build/
+dist/
+
+# Tool caches
+**/.cache/
+**/.mypy_cache/
+**/.pytest_cache/
+**/.ruff_cache/
+
+# Test and coverage output
+**/.coverage
+**/.coverage.*
+**/coverage.xml
+**/htmlcov/
+reports/
+
+# Editors and local agent config
+**/.idea/
+**/.vscode/
+.claude/
+
+# Local environment files and shell history
+**/.env
+**/*.env
+**/.bash_history
