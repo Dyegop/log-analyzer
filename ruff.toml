@@ -1,0 +1,100 @@
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".coverage",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".idea",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "coverage.xml",
+    "dist",
+    "htmlcov",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+# Set line-length and indent-width.
+line-length = 120
+indent-width = 4
+
+# Set used Python target version.
+target-version = "py311"
+
+# Source roots used for first-party import detection.
+src = ["src"]
+
+
+
+[lint]
+# Linting rules.
+# E  - pycodestyle errors (style, blank lines, comparisons, etc.)
+# F  - pyflakes (unused imports, undefined vars, etc.)
+# B  - bugbear (common bug patterns)
+# I  - isort (import sorting)
+# PL - pylint port (design smells: too many args/branches/returns, etc.)
+# UP - pyupgrade (modernizes syntax to the targeted Python version)
+# SIM - flake8-simplify (collapses redundant if/with patterns)
+# C4  - flake8-comprehensions (better list/dict/set comprehensions)
+# PTH - flake8-use-pathlib (pathlib.Path instead of os.path / string paths)
+select = [
+    "E",
+    "F",
+    "B",
+    "I",
+    "PL",
+    "UP",
+    "SIM",
+    "C4",
+    "PTH",
+    "W505",
+]
+
+# Rules to ignore.
+# PLR2004 - magic numbers in comparisons (too noisy: e.g. `if status == 200`).
+# E501 - Ignore line-length violations because Black handles it.
+ignore = ["PLR2004"]
+ignore = ["E501"]
+
+# Allow fix for all enabled rules (when `--fix` is provided).
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Per-file ignores
+[lint.per-file-ignores]
+"__init__.py" = ["E402"]
+"**/{tests,docs,tools}/*" = ["E402"]
+
+# Pycodestyle configuration
+[lint.pycodestyle]
+max-doc-length = 120
+
+# Formatting options
+[format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = true
+docstring-code-line-length = "dynamic"
