@@ -1,0 +1,11 @@
+[project]
+name = "log-analyzer"
+version = "0.1.0"
+description = "Analyze the content of log files."
+readme = "README.md"
+requires-python = ">=3.11"
+
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Dyegop/log-analyzer"
