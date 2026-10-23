@@ -1,13 +1,13 @@
 from decimal import Decimal
 from ipaddress import IPv4Address, IPv6Address
 
-from pydantic import Field
-
-from log_analyzer.domain.strict_model import StrictModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class LogRecord(StrictModel):
+class LogRecord(BaseModel):
     """Represent a parsed event with validated fields."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
     timestamp: Decimal | None = Field(
         default=None,
@@ -27,14 +27,12 @@ class LogRecord(StrictModel):
     )
     response_header_bytes: int | None = Field(
         default=None,
-        strict=True,
         ge=0,
         description="Response header size in bytes.",
         examples=[1372],
     )
     response_bytes: int | None = Field(
         default=None,
-        strict=True,
         ge=0,
         description="Response size in bytes recorded in the event.",
         examples=[399],
