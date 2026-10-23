@@ -17,4 +17,4 @@ class CsvParser(Parser):
         Args:
             stream: Text stream containing CSV log records.
         """
-        yield from csv.reader(stream)
+        yield from csv.reader(stream, delimiter=self._delimiter)
