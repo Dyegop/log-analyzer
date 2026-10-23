@@ -71,8 +71,7 @@ select = [
 # Rules to ignore.
 # PLR2004 - magic numbers in comparisons (too noisy: e.g. `if status == 200`).
 # E501 - Ignore line-length violations because Black handles it.
-ignore = ["PLR2004"]
-ignore = ["E501"]
+ignore = ["PLR2004", "E501"]
 
 # Allow fix for all enabled rules (when `--fix` is provided).
 fixable = ["ALL"]
