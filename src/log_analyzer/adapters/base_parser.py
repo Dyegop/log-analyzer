@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from typing import TextIO
 
-from log_analyzer.domain.log_record import LogRecord
+from src.log_analyzer.domain import LogRecord
 
 logger: logging.Logger = logging.getLogger(__name__)
 
