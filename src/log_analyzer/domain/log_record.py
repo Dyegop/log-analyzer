@@ -1,0 +1,41 @@
+from decimal import Decimal
+from ipaddress import IPv4Address, IPv6Address
+
+from pydantic import Field
+
+from log_analyzer.domain.strict_model import StrictModel
+
+
+class LogRecord(StrictModel):
+    """Represent a parsed event with validated fields."""
+
+    timestamp: Decimal | None = Field(
+        default=None,
+        allow_inf_nan=False,
+        description="Event timestamp in Unix seconds.",
+        examples=["1157689324.156"],
+    )
+    client_ip: IPv4Address | IPv6Address | None = Field(
+        default=None,
+        description="Client IP address recorded in the event.",
+        examples=["10.105.21.199"],
+    )
+    destination_ip: IPv4Address | IPv6Address | None = Field(
+        default=None,
+        description="Destination IP address recorded in the event.",
+        examples=["66.102.9.147"],
+    )
+    response_header_bytes: int | None = Field(
+        default=None,
+        strict=True,
+        ge=0,
+        description="Response header size in bytes.",
+        examples=[1372],
+    )
+    response_bytes: int | None = Field(
+        default=None,
+        strict=True,
+        ge=0,
+        description="Response size in bytes recorded in the event.",
+        examples=[399],
+    )
