@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=83.0.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "log-analyzer"
 version = "0.1.0"
@@ -5,7 +9,15 @@ description = "Analyze the content of log files."
 readme = "README.md"
 requires-python = ">=3.11"
 
-dependencies = []
+dependencies = [
+    "pydantic>=2,<3",
+]
+
+[project.scripts]
+log-analyzer = "log_analyzer.cli:main"
 
 [project.urls]
 Repository = "https://github.com/Dyegop/log-analyzer"
+
+[tool.setuptools.packages.find]
+where = ["src"]
