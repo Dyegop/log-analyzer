@@ -14,7 +14,7 @@ class IPFrequency(StrictModel):
     )
     count: int = Field(
         ge=1,
-        description="Number of occurrences across both IP fields.",
+        description="Number of occurrences.",
         examples=[3],
     )
 
