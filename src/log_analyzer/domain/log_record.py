@@ -1,13 +1,13 @@
 from decimal import Decimal
 from ipaddress import IPv4Address, IPv6Address
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from log_analyzer.domain.strict_model import StrictModel
 
 
-class LogRecord(BaseModel):
+class LogRecord(StrictModel):
     """Represent a parsed event with validated fields."""
-
-    model_config = ConfigDict(extra="forbid", frozen=True)
 
     timestamp: Decimal | None = Field(
         default=None,
