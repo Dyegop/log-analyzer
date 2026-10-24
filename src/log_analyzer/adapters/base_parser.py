@@ -30,7 +30,7 @@ class Parser(ABC):
 
         rejected_count = 0
 
-        for _, fields in enumerate(self._read_fields(stream), start=1):
+        for fields in self._read_fields(stream):
             try:
                 record = self._build_record(fields)
             except ValueError:
@@ -61,7 +61,7 @@ class Parser(ABC):
             fields: List of fields to build records from.
 
         Raises:
-            ValueError: If the row structure or field values are invalid.
+            ValueError: If the row has the wrong field count or no usable values.
         """
 
         if len(fields) != 10:
@@ -69,15 +69,15 @@ class Parser(ABC):
 
         # Parsing for field holding `Type of access/destination IP address`
         access_type, separator, destination = fields[8].partition("/")
-        if not separator or not access_type or not destination:
-            raise ValueError("Expected the destination field in access-type/destination IP address format.")
-
-        return LogRecord.model_validate(
+        record = LogRecord.model_validate(
             {
                 "timestamp": fields[0],
                 "client_ip": fields[2],
-                "destination_ip": destination,
+                "destination_ip": destination if access_type and separator and destination else None,
                 "response_header_bytes": fields[1],
                 "response_bytes": fields[4],
             }
         )
+        if all(getattr(record, name) is None for name in LogRecord.model_fields):
+            raise ValueError("No usable fields in record.")
+        return record
