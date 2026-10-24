@@ -12,7 +12,6 @@ logger: logging.Logger = logging.getLogger(__name__)
 
 class Parser(ABC):
     """
-
     Convert rows from given files into normalized log records.
 
     Fields are identified based on their position, rather than inferred from their values.
@@ -38,7 +37,6 @@ class Parser(ABC):
                 rejected_count += 1
                 logger.warning("Skipping invalid record at row %s", row_number)
                 continue
-
             yield record
 
         if rejected_count:
@@ -60,9 +58,6 @@ class Parser(ABC):
     def _build_record(fields: list[str]) -> LogRecord:
         """
         Map file fields into a domain record.
-
-        Returns:
-            A validated LogRecord entity.
 
         Raises:
             ValueError: If the row structure or field values are invalid.
