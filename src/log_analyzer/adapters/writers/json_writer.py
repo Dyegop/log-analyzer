@@ -1,4 +1,4 @@
-from log_analyzer.adapters.base_writer import Writer
+from log_analyzer.adapters.writers.base_writer import Writer
 from log_analyzer.domain import AggregateResults
 
 

@@ -5,7 +5,7 @@ import csv
 import logging
 from pathlib import Path
 
-from log_analyzer.adapters.json_writer import JsonWriter
+from log_analyzer.adapters import JsonWriter
 from log_analyzer.service import LogAnalyzerService
 
 logger = logging.getLogger(__name__)

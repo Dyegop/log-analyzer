@@ -2,7 +2,7 @@ import csv
 from collections.abc import Iterator
 from typing import TextIO
 
-from log_analyzer.adapters.base_parser import Parser
+from log_analyzer.adapters.parsers.base_parser import Parser
 
 
 class CsvParser(Parser):
