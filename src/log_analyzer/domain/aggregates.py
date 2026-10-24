@@ -2,7 +2,8 @@ from collections import Counter
 from decimal import Decimal
 from ipaddress import IPv4Address, IPv6Address
 
-from log_analyzer.domain import AggregateResults, IPFrequency, LogRecord
+from log_analyzer.domain.aggregate_results import AggregateResults, IPFrequency
+from log_analyzer.domain.log_record import LogRecord
 
 
 class LogAggregates:
