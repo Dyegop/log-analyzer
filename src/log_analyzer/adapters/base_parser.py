@@ -56,8 +56,10 @@ class Parser(ABC):
 
     @staticmethod
     def _build_record(fields: list[str]) -> LogRecord:
-        """
-        Map file fields into a domain record.
+        """Map file fields into a domain record.
+
+        Args:
+            fields: List of fields to build records from.
 
         Raises:
             ValueError: If the row structure or field values are invalid.
