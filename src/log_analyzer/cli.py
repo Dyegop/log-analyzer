@@ -81,7 +81,22 @@ def main(argv: list[str] | None = None) -> int:
     except (OSError, ValueError):
         logger.error("Analysis or output failed, no results were saved.")
         return 1
+    finally:
+        metrics = service.metrics
+        log_message = (
+            "Records: %s accepted, %s rejected. Files failed: %s.",
+            metrics.accepted_records,
+            metrics.rejected_records,
+            metrics.failed_files,
+        )
+        if metrics.has_failures:
+            logger.warning(*log_message)
+        else:
+            logger.info(*log_message)
 
+    if metrics.has_failures:
+        logger.warning("Partial results saved to %s", arguments.output)
+        return 3
     logger.info("Results saved to %s", arguments.output)
     return 0
 

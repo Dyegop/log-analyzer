@@ -19,6 +19,7 @@ from log_analyzer.domain import (
     AggregateResults,
     LogAggregates,
     LogRecord,
+    Metrics,
 )
 
 logger: logging.Logger = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ class LogAnalyzerService:
             TXT_EXTENSION: txt_parser,
             CSV_EXTENSION: CsvParser(delimiter=delimiter),
         }
+        self.metrics = Metrics()
 
     def analyze(
         self,
@@ -68,6 +70,7 @@ class LogAnalyzerService:
         with closing(self._read_records(paths)) as records:
             for record in records:
                 aggregates.aggregate(record)
+                self.metrics.accepted_records += 1
 
         return aggregates.produce_results()
 
@@ -84,17 +87,18 @@ class LogAnalyzerService:
         for source, stream in self._read_files(paths):
             parser = self._parsers.get(Path(source).suffix.lower())
             if parser is None:
+                self.metrics.failed_files += 1
                 logger.warning("Skipping unsupported input source: %s", source)
                 continue
 
             logger.info("Processing input source: %s", source)
             try:
-                yield from parser.parse(stream)
+                yield from parser.parse(stream, metrics=self.metrics)
             except (OSError, EOFError, UnicodeDecodeError, csv.Error, ZlibError):
+                self.metrics.failed_files += 1
                 logger.warning("Unable to finish reading input source: %s", source)
 
-    @staticmethod
-    def _read_files(paths: list[Path]) -> Iterator[tuple[str, TextIO]]:
+    def _read_files(self, paths: list[Path]) -> Iterator[tuple[str, TextIO]]:
         """Open plain or gzip-compressed input files as text streams.
 
         Args:
@@ -107,6 +111,7 @@ class LogAnalyzerService:
         for path in paths:
             extension = path.suffix.lower()
             if extension not in SUPPORTED_EXTENSIONS:
+                self.metrics.failed_files += 1
                 logger.warning("Skipping unsupported input file: %s", path)
                 continue
 
@@ -118,4 +123,5 @@ class LogAnalyzerService:
                     with path.open("r", encoding="utf-8", newline="") as stream:
                         yield str(path), stream
             except OSError:
+                self.metrics.failed_files += 1
                 logger.warning("Unable to open input file: %s", path)

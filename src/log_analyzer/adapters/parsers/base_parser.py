@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from typing import TextIO
 
-from log_analyzer.domain import LogRecord
+from log_analyzer.domain import LogRecord, Metrics
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -18,11 +18,12 @@ class Parser(ABC):
     Concrete parsers handle the file format while sharing the same field order and meanings.
     """
 
-    def parse(self, stream: TextIO) -> Iterator[LogRecord]:
+    def parse(self, stream: TextIO, *, metrics: Metrics) -> Iterator[LogRecord]:
         """Parse records, ignoring invalid rows.
 
         Args:
             stream: Text stream containing log records.
+            metrics: Processing counters for the current analysis.
 
         Yields:
             Validated log records in source order.
@@ -35,6 +36,7 @@ class Parser(ABC):
                 record = self._build_record(fields)
             except ValueError as error:
                 rejected_count += 1
+                metrics.rejected_records += 1
                 logger.warning("Skipping unusable row %s: %s", row_number, error)
                 continue
             yield record
