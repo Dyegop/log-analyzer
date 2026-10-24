@@ -1,7 +1,14 @@
 """Command-line entry point."""
 
 import argparse
+import csv
+import logging
 from pathlib import Path
+
+from log_analyzer.adapters.json_writer import JsonWriter
+from log_analyzer.service import LogAnalyzerService
+
+logger = logging.getLogger(__name__)
 
 
 def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
@@ -31,9 +38,10 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("input", nargs="+", type=Path, help="Paths to one or more input log files.")
     parser.add_argument("output", type=Path, help="Path to the output JSON file.")
+    parser.add_argument("--delimiter", default=",", help="CSV field separator (default: comma).")
     operations = parser.add_argument_group("operations", "Select one or more operations.")
-    operations.add_argument("--mfip", action="store_true", help="Calculate the most frequent client IP.")
-    operations.add_argument("--lfip", action="store_true", help="Calculate the least frequent client IP.")
+    operations.add_argument("--mfip", action="store_true", help="Calculate the most frequent IPs.")
+    operations.add_argument("--lfip", action="store_true", help="Calculate the least frequent IPs.")
     operations.add_argument("--eps", action="store_true", help="Calculate events per second.")
     operations.add_argument("--bytes", action="store_true", help="Calculate the total bytes exchanged.")
 
@@ -42,12 +50,39 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     if not any((arguments.mfip, arguments.lfip, arguments.eps, arguments.bytes)):
         parser.error("select at least one operation: --mfip, --lfip, --eps, or --bytes")
 
+    try:
+        csv.reader([], delimiter=arguments.delimiter)
+    except (TypeError, ValueError):
+        parser.error("--delimiter must be a single character accepted by the CSV reader")
+
     return arguments
 
 
-def main() -> int:
-    """Parse command-line arguments."""
-    parse_arguments()
+def main(argv: list[str] | None = None) -> int:
+    """Analyze inputs and write JSON; return 0 for success, 1 for failure, 3 for partial results."""
+
+    arguments = parse_arguments(argv)
+    service = LogAnalyzerService(delimiter=arguments.delimiter)
+
+    try:
+        if any(arguments.output.resolve() == path.resolve() for path in arguments.input):
+            raise ValueError("Output must not overwrite an input file.")
+
+        results = service.analyze(
+            arguments.input,
+            mfip=arguments.mfip,
+            lfip=arguments.lfip,
+            eps=arguments.eps,
+            bytes_exchanged=arguments.bytes,
+        )
+        writer = JsonWriter(arguments.output)
+        writer.write(results)
+
+    except (OSError, ValueError):
+        logger.error("Analysis or output failed, no results were saved.")
+        return 1
+
+    logger.info("Results saved to %s", arguments.output)
     return 0
 
 
