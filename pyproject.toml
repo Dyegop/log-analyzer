@@ -9,12 +9,16 @@ description = "Analyze the content of log files."
 readme = "README.md"
 requires-python = ">=3.11"
 
-dependencies = [
-    "pydantic>=2,<3",
-]
+dependencies = ["pydantic>=2,<3"]
 
 [project.scripts]
 log-analyzer = "log_analyzer.cli:main"
+
+[project.optional-dependencies]
+test = ["pytest>=8,<10"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [project.urls]
 Repository = "https://github.com/Dyegop/log-analyzer"
