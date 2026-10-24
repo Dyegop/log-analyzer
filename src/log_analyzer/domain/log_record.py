@@ -1,7 +1,8 @@
 from decimal import Decimal
 from ipaddress import IPv4Address, IPv6Address
+from typing import Any
 
-from pydantic import Field
+from pydantic import Field, ValidatorFunctionWrapHandler, field_validator
 
 from log_analyzer.domain.strict_model import StrictModel
 
@@ -37,3 +38,12 @@ class LogRecord(StrictModel):
         description="Response size in bytes recorded in the event.",
         examples=[399],
     )
+
+    @field_validator("*", mode="wrap")
+    @classmethod
+    def normalize_field(cls, value: Any, handler: ValidatorFunctionWrapHandler) -> Any:
+        """Validate each field and normalize invalid values to None."""
+        try:
+            return handler(value)
+        except ValueError:
+            return None
