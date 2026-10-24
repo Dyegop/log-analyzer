@@ -30,11 +30,12 @@ class Parser(ABC):
 
         rejected_count = 0
 
-        for fields in self._read_fields(stream):
+        for row_number, fields in enumerate(self._read_fields(stream), start=1):
             try:
                 record = self._build_record(fields)
-            except ValueError:
+            except ValueError as error:
                 rejected_count += 1
+                logger.warning("Skipping unusable row %s: %s", row_number, error)
                 continue
             yield record
 
