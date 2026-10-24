@@ -9,8 +9,7 @@ from log_analyzer.domain.log_record import LogRecord
 class LogAggregates:
     """Incremental calculations for log records.
 
-    IP frequencies combine client and destination occurrences. An IP appearing
-    in both fields of a record counts twice; unavailable IP fields are skipped.
+    IP frequencies count client IP occurrences; unavailable client IPs are skipped.
     """
 
     def __init__(
@@ -24,8 +23,8 @@ class LogAggregates:
         """Select the calculations to aggregate from.
 
         Args:
-            mfip: Calculate the most frequent IPs across both fields.
-            lfip: Calculate the least frequent IPs across both fields.
+            mfip: Calculate the most frequent client IPs.
+            lfip: Calculate the least frequent client IPs.
             eps: Calculate the average events per second over the observed duration.
             bytes_exchanged: Sum response header and response byte counts.
         """
@@ -79,11 +78,9 @@ class LogAggregates:
         self._record_count += 1
 
     def _aggregate_ips(self, record: LogRecord) -> None:
-        """Count each available client and destination IP occurrence."""
+        """Count each available client IP occurrence."""
         if record.client_ip:
             self._ip_counts[record.client_ip] += 1
-        if record.destination_ip:
-            self._ip_counts[record.destination_ip] += 1
 
     def _aggregate_bytes(self, record: LogRecord) -> None:
         """Sum available byte fields independently."""
@@ -121,7 +118,7 @@ class LogAggregates:
         """Select every IP tied at the requested frequency extreme.
 
         Args:
-            counts: Combined client and destination IP occurrence counts.
+            counts: Client IP occurrence counts.
             most: Select the maximum when true, otherwise the minimum.
 
         Returns:

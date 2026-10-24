@@ -21,11 +21,6 @@ class LogRecord(StrictModel):
         description="Client IP address recorded in the event.",
         examples=["10.105.21.199"],
     )
-    destination_ip: IPv4Address | IPv6Address | None = Field(
-        default=None,
-        description="Destination IP address recorded in the event.",
-        examples=["66.102.9.147"],
-    )
     response_header_bytes: int | None = Field(
         default=None,
         ge=0,

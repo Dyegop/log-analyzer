@@ -68,13 +68,10 @@ class Parser(ABC):
         if len(fields) != 10:
             raise ValueError(f"Expected ten fields, found {len(fields)}.")
 
-        # Parsing for field holding `Type of access/destination IP address`
-        access_type, separator, destination = fields[8].partition("/")
         record = LogRecord.model_validate(
             {
                 "timestamp": fields[0],
                 "client_ip": fields[2],
-                "destination_ip": destination if access_type and separator and destination else None,
                 "response_header_bytes": fields[1],
                 "response_bytes": fields[4],
             }

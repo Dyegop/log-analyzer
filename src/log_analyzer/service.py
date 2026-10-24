@@ -54,8 +54,8 @@ class LogAnalyzerService:
 
         Args:
             paths: Input paths to read and parse.
-            mfip: Calculate the most frequent IPs across both fields.
-            lfip: Calculate the least frequent IPs across both fields.
+            mfip: Calculate the most frequent client IPs.
+            lfip: Calculate the least frequent client IPs.
             eps: Calculate average events per second for timestamped records.
             bytes_exchanged: Sum response header and response bytes.
 

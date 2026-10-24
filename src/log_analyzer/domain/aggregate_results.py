@@ -9,7 +9,7 @@ class IPFrequency(StrictModel):
     """An IP address with its occurrence count."""
 
     ip: IPv4Address | IPv6Address = Field(
-        description="Client or destination IP address.",
+        description="Client IP address.",
         examples=["10.0.0.1"],
     )
     count: int = Field(
