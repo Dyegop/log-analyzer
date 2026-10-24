@@ -81,17 +81,17 @@ class LogAnalyzerService:
             Validated records from supported input file extensions.
         """
 
-        for file_ext, stream in self._read_files(paths):
-            parser = self._parsers.get(Path(file_ext).suffix.lower())
+        for source, stream in self._read_files(paths):
+            parser = self._parsers.get(Path(source).suffix.lower())
             if parser is None:
-                logger.warning("Skipping unsupported input file_ext: %s", file_ext)
+                logger.warning("Skipping unsupported input source: %s", source)
                 continue
 
-            logger.info("Processing input file_ext: %s", file_ext)
+            logger.info("Processing input source: %s", source)
             try:
                 yield from parser.parse(stream)
             except (OSError, EOFError, UnicodeDecodeError, csv.Error, ZlibError):
-                logger.warning("Unable to finish reading input file_ext: %s", file_ext)
+                logger.warning("Unable to finish reading input source: %s", source)
 
     @staticmethod
     def _read_files(paths: list[Path]) -> Iterator[tuple[str, TextIO]]:
@@ -101,7 +101,7 @@ class LogAnalyzerService:
             paths: Input paths to process in order.
 
         Yields:
-            File extension and open UTF-8 text streams.
+           Source file and open UTF-8 text streams.
         """
 
         for path in paths:
