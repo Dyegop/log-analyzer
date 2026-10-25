@@ -34,7 +34,7 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("input", nargs="+", type=Path, help="Paths to one or more input log files.")
     parser.add_argument("output", type=Path, help="Path to the output file. Only JSON format is supported.")
     parser.add_argument("--delimiter", default=",", help="CSV field separator (default: comma).")
-    operations = parser.add_argument_group("operations", "Select one or more operations.")
+    operations = parser.add_argument_group(title="operations", description="Select one or more operations.")
     operations.add_argument("--mfip", action="store_true", help="Calculate the most frequent IPs.")
     operations.add_argument("--lfip", action="store_true", help="Calculate the least frequent IPs.")
     operations.add_argument("--eps", action="store_true", help="Calculate events per second.")
