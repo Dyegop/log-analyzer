@@ -7,21 +7,14 @@ from pathlib import Path
 
 from log_analyzer.adapters import JsonWriter
 from log_analyzer.service import LogAnalyzerService
+from log_analyzer.utils.paths import has_matching_name
 
 logger = logging.getLogger(__name__)
 
 
 def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     """
-    Parse input user arguments. Available operations are:
-        - Arguments:
-            input: Path to one or more input files.
-            output: Path to a file to save output in plain text JSON format.
-        - Options:
-            mfip: the most frequent IP
-            lfip: the least frequent IP
-            eps: numbered of events per second
-            bytes: the total amount of bytes exchanged
+    Parse input user arguments.
 
     Args:
         argv: Arguments to parse; defaults to the process command-line arguments.
@@ -34,10 +27,10 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     """
     parser = argparse.ArgumentParser(
         description="Analyze the content of log files.",
-        epilog="Example: log-analyzer access.log another.log results.json --mfip --bytes",
+        epilog="Example: log-analyzer access.log another.log results --mfip --lfip --bytes --eps",
     )
     parser.add_argument("input", nargs="+", type=Path, help="Paths to one or more input log files.")
-    parser.add_argument("output", type=Path, help="Path to the output JSON file.")
+    parser.add_argument("output", type=Path, help="Path to the output file. Only JSON format is supported.")
     parser.add_argument("--delimiter", default=",", help="CSV field separator (default: comma).")
     operations = parser.add_argument_group("operations", "Select one or more operations.")
     operations.add_argument("--mfip", action="store_true", help="Calculate the most frequent IPs.")
@@ -46,6 +39,9 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     operations.add_argument("--bytes", action="store_true", help="Calculate the total bytes exchanged.")
 
     arguments = parser.parse_args(argv)
+
+    if arguments.output.suffix:
+        parser.error("output filename must not include a file extension")
 
     if not any((arguments.mfip, arguments.lfip, arguments.eps, arguments.bytes)):
         parser.error("select at least one operation: --mfip, --lfip, --eps, or --bytes")
@@ -65,8 +61,8 @@ def main(argv: list[str] | None = None) -> int:
     service = LogAnalyzerService(delimiter=arguments.delimiter)
 
     try:
-        if any(arguments.output.resolve() == path.resolve() for path in arguments.input):
-            raise ValueError("Output must not overwrite an input file.")
+        if has_matching_name(output=arguments.output, inputs=arguments.input):
+            raise ValueError("Input and output names must be different.")
 
         results = service.analyze(
             arguments.input,
@@ -78,9 +74,10 @@ def main(argv: list[str] | None = None) -> int:
         writer = JsonWriter(arguments.output)
         writer.write(results)
 
-    except (OSError, ValueError):
-        logger.error("Analysis or output failed, no results were saved.")
+    except (OSError, ValueError) as err:
+        logger.error("Analysis or output failed: %s", err)
         return 1
+
     finally:
         metrics = service.metrics
         log_message = (
@@ -95,9 +92,9 @@ def main(argv: list[str] | None = None) -> int:
             logger.info(*log_message)
 
     if metrics.has_failures:
-        logger.warning("Partial results saved to %s", arguments.output)
+        logger.warning("Partial results saved to %s.json", arguments.output)
         return 3
-    logger.info("Results saved to %s", arguments.output)
+    logger.info("Results saved to %s.json", arguments.output)
     return 0
 
 
