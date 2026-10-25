@@ -6,7 +6,7 @@ from log_analyzer.adapters.parsers.base_parser import Parser
 
 
 class CsvParser(Parser):
-    """Parse CSV logs, separated by a given delimitir (defaults to `,`)."""
+    """Parse CSV logs, separated by a given delimitir; defaults to comma."""
 
     def __init__(self, delimiter: str = ",") -> None:
         self._delimiter = delimiter
