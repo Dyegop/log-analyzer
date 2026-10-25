@@ -94,9 +94,9 @@ class LogAnalyzerService:
             logger.info("Processing input source: %s", source)
             try:
                 yield from parser.parse(stream, metrics=self.metrics)
-            except (OSError, EOFError, UnicodeDecodeError, csv.Error, ZlibError):
+            except (OSError, EOFError, UnicodeDecodeError, csv.Error, ZlibError) as err:
                 self.metrics.failed_files += 1
-                logger.warning("Unable to finish reading input source: %s", source)
+                logger.warning("Unable to finish reading input source %s: %s", source, err)
 
     def _read_files(self, paths: list[Path]) -> Iterator[tuple[str, TextIO]]:
         """Open plain or gzip-compressed input files as text streams.
@@ -122,6 +122,6 @@ class LogAnalyzerService:
                 else:
                     with path.open("r", encoding="utf-8", newline="") as stream:
                         yield str(path), stream
-            except OSError:
+            except OSError as err:
                 self.metrics.failed_files += 1
-                logger.warning("Unable to open input file: %s", path)
+                logger.warning("Unable to open input file %s: %s", path, err)
