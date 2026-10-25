@@ -16,6 +16,8 @@ def parse_arguments(argv: list[str] | None = None) -> argparse.Namespace:
     """
     Parse input user arguments.
 
+    # TODO:2026-10-25:diego: Add support for additional output formats. Only JSON is currently supported.
+
     Args:
         argv: Arguments to parse; defaults to the process command-line arguments.
 
